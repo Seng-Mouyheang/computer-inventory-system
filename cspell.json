@@ -1,7 +1,7 @@
 {
 	"version": "0.2",
 	"language": "en",
-	"words": ["devops", "seng", "mouyheang", "heng", "vicheka", "chanpheakdey"],
+	"words": ["devops", "seng", "mouyheang", "heng", "vicheka", "chanpheakdey", "prepush"],
 	"ignorePaths": [
 		"cspell.json",
 		"node_modules",

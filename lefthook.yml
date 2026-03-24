@@ -19,8 +19,5 @@ pre-commit:
 
 pre-push:
   commands:
-    # packages audit:
-    #   run: pnpm audit --audit-level=low
-
-    # gems audit:
-    #   run: bundle audit
+    packages audit:
+      run: pnpm audit --audit-level=low
