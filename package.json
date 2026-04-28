@@ -24,6 +24,7 @@
 		"lint:prettier": "prettier --check .",
 		"lint:spell": "cspell .",
 		"format": "prettier --write .",
+		"seed": "tsx src/db/seed.ts",
 		"prepare": "lefthook install",
 		"precommit": "lefthook run pre-commit",
 		"prepush": "lefthook run pre-push",
