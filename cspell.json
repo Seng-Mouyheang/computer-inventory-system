@@ -2,16 +2,17 @@
 	"version": "0.2",
 	"language": "en",
 	"words": [
-		"devops",
-		"seng",
-		"mouyheang",
-		"heng",
-		"vicheka",
 		"chanpheakdey",
+		"checkin",
+		"devops",
+		"heng",
+		"libsql",
+		"mouyheang",
 		"prepush",
+		"seng",
 		"turso",
 		"TURSO",
-		"libsql"
+		"vicheka"
 	],
 	"ignorePaths": [
 		"cspell.json",
