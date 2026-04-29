@@ -2,6 +2,7 @@
 	"version": "0.2",
 	"language": "en",
 	"words": [
+		"bitbin",
 		"chanpheakdey",
 		"checkin",
 		"devops",
@@ -24,6 +25,7 @@
 		"pnpm-workspace.yaml",
 		"package-lock.json",
 		"package.json",
+		"public",
 		"dist",
 		"build",
 		"*.log",
