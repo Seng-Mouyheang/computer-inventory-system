@@ -8,6 +8,33 @@ const __dirname = dirname(__filename)
 
 const app = express()
 
+function parseCookies(cookieHeader) {
+	if (!cookieHeader) return {}
+	return Object.fromEntries(
+		cookieHeader
+			.split(';')
+			.map((cookie) => cookie.trim().split('='))
+			.map(([name, value]) => [name, decodeURIComponent(value || '')]),
+	)
+}
+
+function isAuthenticated(req) {
+	const cookies = parseCookies(req.headers.cookie)
+	return cookies.auth === '1'
+}
+
+function authMiddleware(req, res, next) {
+	if (req.path === '/login' || req.path === '/logout') {
+		return next()
+	}
+
+	if (!isAuthenticated(req)) {
+		return res.redirect('/login')
+	}
+
+	return next()
+}
+
 // ─── View Engine ─────────────────────────────────────────────────────────────
 app.engine(
 	'hbs',
@@ -50,13 +77,10 @@ app.engine(
 app.set('view engine', 'hbs')
 app.set('views', join(__dirname, '..', '..', 'views'))
 
-// ─── Request locals for template rendering ─────────────────────────────────
-app.use((req, res, next) => {
-	res.locals.currentPath = req.path
-	next()
-})
-
-// ─── Static Assets (for CSS/JS used by views) ───────────────────────────────
+app.use(express.urlencoded({ extended: true }))
 app.use(express.static(join(__dirname, '..', '..', 'public')))
+app.use(authMiddleware)
+
+// ─── Routes ──────────────────────────────────────────────────────────────────
 
 export default app
