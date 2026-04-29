@@ -2,18 +2,21 @@
 	"version": "0.2",
 	"language": "en",
 	"words": [
+		"bitbin",
 		"chanpheakdey",
 		"checkin",
 		"devops",
 		"heng",
+		"Liant",
 		"libsql",
 		"mouyheang",
+		"OptiPlex",
 		"prepush",
 		"seng",
+		"topbar",
 		"turso",
 		"TURSO",
-		"vicheka",
-		"OptiPlex"
+		"vicheka"
 	],
 	"ignorePaths": [
 		"cspell.json",
@@ -22,6 +25,7 @@
 		"pnpm-workspace.yaml",
 		"package-lock.json",
 		"package.json",
+		"public",
 		"dist",
 		"build",
 		"*.log",
