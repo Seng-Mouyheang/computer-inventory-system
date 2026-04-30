@@ -12,7 +12,7 @@ app.disable('x-powered-by')
 app.use(auditLogger)
 app.use(corsMiddleware)
 app.use(rateLimitMiddleware)
-app.use(express.json())
+app.use(express.json({ limit: '20mb' }))
 
 app.use('/api', apiRouter)
 app.use('/', clientRouter)

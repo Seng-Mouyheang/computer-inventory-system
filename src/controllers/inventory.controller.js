@@ -132,3 +132,33 @@ export const createDevice = async (req, res) => {
 		return res.status(500).json({ message: 'Failed to create device.', error: error.message })
 	}
 }
+
+export const deleteDevice = async (req, res) => {
+	try {
+		const { id } = req.params
+		if (!id) {
+			return res.status(400).json({ message: 'Device id is required.' })
+		}
+
+		const [existing] = await db
+			.select()
+			.from(devices)
+			.where(eq(devices.id, Number(id)))
+			.limit(1)
+		if (!existing) {
+			return res.status(404).json({ message: 'Device not found.' })
+		}
+
+		await db
+			.update(devices)
+			.set({
+				isDeleted: true,
+				dateDeleted: new Date().toISOString(),
+			})
+			.where(eq(devices.id, Number(id)))
+
+		return res.status(200).json({ message: 'Device deleted successfully.' })
+	} catch (error) {
+		return res.status(500).json({ message: 'Failed to delete device.', error: error.message })
+	}
+}
