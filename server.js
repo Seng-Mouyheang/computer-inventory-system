@@ -3,13 +3,17 @@ import app from './src/config/view.js'
 import corsMiddleware from './src/config/cors.js'
 import rateLimitMiddleware from './src/config/rateLimit.js'
 import auditLogger from './src/config/morgan.js'
-import apiRouter from './src/routes/api.js'
+import apiRouter from './src/routes/api.routes.js'
+import clientRouter from './src/routes/client.routes.js'
+
+app.disable('x-powered-by')
 
 app.use(auditLogger)
 app.use(corsMiddleware)
 app.use(rateLimitMiddleware)
 
 app.use('/api', apiRouter)
+app.use('/', clientRouter)
 
 const port = process.env.PORT || 3000
 
