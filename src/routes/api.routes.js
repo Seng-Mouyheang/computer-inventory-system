@@ -1,5 +1,11 @@
 import { Router } from 'express'
-import { getItems, createDevice, deleteDevice } from '../controllers/inventory.controller.js'
+import {
+	getItems,
+	createDevice,
+	deleteDevice,
+	getDeviceCategories,
+	getDeviceStatuses,
+} from '../controllers/inventory.controller.js'
 import { uploadImage } from '../controllers/upload.controller.js'
 
 const apiRouter = Router()
@@ -22,7 +28,9 @@ apiRouter.post('/keys', notImplemented)
 apiRouter.get('/keys', notImplemented)
 apiRouter.delete('/keys/:id', notImplemented)
 
-apiRouter.post('/upload', uploadImage)
+apiRouter.post('/items/upload', uploadImage)
+apiRouter.get('/items/device-categories', getDeviceCategories)
+apiRouter.get('/items/device-statuses', getDeviceStatuses)
 apiRouter.get('/items', getItems)
 apiRouter.get('/items/:id/history', notImplemented)
 apiRouter.post('/items', createDevice)

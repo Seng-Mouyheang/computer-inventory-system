@@ -95,22 +95,65 @@ export const getItems = async (_req, res) => {
 	}
 }
 
+export const getDeviceCategories = async (_req, res) => {
+	try {
+		const rows = await db
+			.select({
+				id: deviceCategories.id,
+				name: deviceCategories.name,
+			})
+			.from(deviceCategories)
+			.orderBy(deviceCategories.name)
+
+		return res.status(200).json({ deviceCategories: rows })
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ message: 'Failed to load device categories.', error: error.message })
+	}
+}
+
+export const getDeviceStatuses = async (_req, res) => {
+	try {
+		const rows = await db
+			.select({
+				id: deviceStatuses.id,
+				name: deviceStatuses.name,
+			})
+			.from(deviceStatuses)
+			.orderBy(deviceStatuses.name)
+
+		return res.status(200).json({ deviceStatuses: rows })
+	} catch (error) {
+		return res
+			.status(500)
+			.json({ message: 'Failed to load device statuses.', error: error.message })
+	}
+}
+
 export const createDevice = async (req, res) => {
 	try {
-		const { serialNumber, modelName, brand, type, category, status, dateAcquired, pictureUrl } =
-			req.body
+		const { serialNumber, modelName, brand, category, status, dateAcquired, pictureUrl } = req.body
 
-		if (!serialNumber?.trim() || !modelName?.trim() || !brand?.trim()) {
-			return res.status(400).json({ message: 'Serial number, model, and brand are required.' })
+		const chosenCategory = String(category || '').trim()
+		const chosenStatus = String(status || '').trim()
+		if (
+			!serialNumber?.trim() ||
+			!modelName?.trim() ||
+			!brand?.trim() ||
+			!chosenCategory ||
+			!chosenStatus
+		) {
+			return res
+				.status(400)
+				.json({ message: 'Serial number, model, brand, category, and status are required.' })
 		}
 
-		const normalizedStatus = String(status || 'Available')
-			.trim()
-			.replaceAll('-', ' ')
-		const typeId = await getOrCreateByName(deviceTypes, type || category || 'Unknown')
+		const normalizedStatus = chosenStatus.trim().replaceAll('-', ' ')
+		const typeId = await getOrCreateByName(deviceTypes, chosenCategory)
 		const brandId = await getOrCreateByName(deviceBrands, brand)
 		const statusId = await getOrCreateByName(deviceStatuses, normalizedStatus)
-		const categoryId = await getOrCreateByName(deviceCategories, category || type || 'Unspecified')
+		const categoryId = await getOrCreateByName(deviceCategories, chosenCategory)
 
 		if (!typeId || !brandId || !statusId || !categoryId) {
 			return res.status(400).json({ message: 'Failed to resolve device metadata.' })

@@ -79,22 +79,25 @@
 				</div>
 				<div class="form-group">
 					<label>Category</label><select id="new-category">
-						<option>Laptop</option>
-						<option>Desktop</option>
-						<option>Server</option>
-						<option>Monitor</option>
-						<option>Keyboard</option>
-						<option>Other</option>
-					</select>
+						<option value="">Loading categories...</option>
+				</select>
+			</div>
+			<div class="form-group full" id="new-category-other-group" style="display: none;">
+				<div class="form-group">
+					<label>Other category</label>
+					<input id="new-category-other" type="text" placeholder="Specify a new category" />
+				</div>
 				</div>
 				<div class="form-group">
 					<label>Status</label><select id="new-status">
-						<option>Available</option>
-						<option>In-Use</option>
-						<option>Maintenance</option>
-						<option>Retired</option>
-					</select>
+						<option value="">Loading statuses...</option>
+								</select>
+				</div>			<div class="form-group full" id="new-status-other-group" style="display: none;">
+					<div class="form-group">
+				<label>Other status</label>
+				<input id="new-status-other" type="text" placeholder="Specify a new status" />
 				</div>
+			</div>				
 				<div class="form-group">
 					<label>Date acquired</label><input id="new-acquired" type="date" />
 				</div>
@@ -118,10 +121,56 @@
 	const defaultImageUrl = '/images/device-placeholder.svg'
 	let selectedDeviceImage = ''
 	let selectedDeviceImageFile = null
+	let deviceCategoriesLoaded = false
+	let deviceStatusesLoaded = false
+
+	async function loadDeviceCategories() {
+		const categorySelect = document.getElementById('new-category')
+		if (!categorySelect) return
+
+		try {
+			const response = await fetch('/api/items/device-categories')
+			if (!response.ok) throw new Error('Unable to load categories.')
+			const data = await response.json()
+			const options = data.deviceCategories
+				.map((category) => `<option value="${category.name}">${category.name}</option>`)
+				.join('')
+			categorySelect.innerHTML = `<option value="">Select category</option>${options}<option value="Other">Other</option>`
+			deviceCategoriesLoaded = true
+		} catch (error) {
+			categorySelect.innerHTML =
+				'<option value="">Failed to load categories</option><option value="Other">Other</option>'
+		}
+	}
+
+	async function loadDeviceStatuses() {
+		const statusSelect = document.getElementById('new-status')
+		if (!statusSelect) return
+
+		try {
+			const response = await fetch('/api/items/device-statuses')
+			if (!response.ok) throw new Error('Unable to load statuses.')
+			const data = await response.json()
+			const options = data.deviceStatuses
+				.map((status) => `<option value="${status.name}">${status.name}</option>`)
+				.join('')
+			statusSelect.innerHTML = `<option value="">Select status</option>${options}<option value="Other">Other</option>`
+			deviceStatusesLoaded = true
+		} catch (error) {
+			statusSelect.innerHTML =
+				'<option value="">Failed to load statuses</option><option value="Other">Other</option>'
+		}
+	}
 
 	function openModal() {
 		resetNewDeviceForm()
 		document.getElementById('modal').classList.add('open')
+		if (!deviceCategoriesLoaded) {
+			loadDeviceCategories()
+		}
+		if (!deviceStatusesLoaded) {
+			loadDeviceStatuses()
+		}
 	}
 
 	function closeModal() {
@@ -132,8 +181,10 @@
 		document.getElementById('new-serial').value = ''
 		document.getElementById('new-model').value = ''
 		document.getElementById('new-brand').value = ''
-		document.getElementById('new-category').value = 'Laptop'
-		document.getElementById('new-status').value = 'Available'
+		document.getElementById('new-category').value = ''
+		document.getElementById('new-category-other').value = ''
+		document.getElementById('new-status').value = ''
+		document.getElementById('new-status-other').value = ''
 		document.getElementById('new-acquired').value = ''
 		document.getElementById('device-image-input').value = ''
 		selectedDeviceImage = ''
@@ -141,6 +192,8 @@
 		const preview = document.getElementById('device-image-preview')
 		preview.hidden = true
 		preview.src = ''
+		document.getElementById('new-category-other-group').style.display = 'none'
+		document.getElementById('new-status-other-group').style.display = 'none'
 	}
 
 	document.getElementById('device-image-input')?.addEventListener('change', function () {
@@ -165,22 +218,36 @@
 		reader.readAsDataURL(file)
 	})
 
+	document.getElementById('new-category')?.addEventListener('change', function () {
+		const otherGroup = document.getElementById('new-category-other-group')
+		otherGroup.style.display = this.value === 'Other' ? 'block' : 'none'
+	})
+
+	document.getElementById('new-status')?.addEventListener('change', function () {
+		const otherGroup = document.getElementById('new-status-other-group')
+		otherGroup.style.display = this.value === 'Other' ? 'block' : 'none'
+	})
+
 	document.getElementById('save-device-btn')?.addEventListener('click', async function () {
 		const serialNumber = document.getElementById('new-serial').value.trim()
 		const modelName = document.getElementById('new-model').value.trim()
 		const brand = document.getElementById('new-brand').value.trim()
-		const category = document.getElementById('new-category').value
-		const status = document.getElementById('new-status').value
+		const categorySelect = document.getElementById('new-category')
+		const customCategory = document.getElementById('new-category-other').value.trim()
+		const statusSelect = document.getElementById('new-status')
+		const customStatus = document.getElementById('new-status-other').value.trim()
 		const dateAcquired = document.getElementById('new-acquired').value
+		const chosenCategory = categorySelect?.value === 'Other' ? customCategory : categorySelect?.value
+		const chosenStatus = statusSelect?.value === 'Other' ? customStatus : statusSelect?.value
 
-		if (!serialNumber || !modelName || !brand) {
-			alert('Please fill in serial number, model, and brand before saving.')
+		if (!serialNumber || !modelName || !brand || !chosenCategory || !chosenStatus) {
+			alert('Please fill in serial number, model, brand, category, and status before saving.')
 			return
 		}
 
 		let pictureUrl = ''
 		if (selectedDeviceImageFile && selectedDeviceImage) {
-			const uploadResponse = await fetch('/api/upload', {
+			const uploadResponse = await fetch('/api/items/upload', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -205,9 +272,9 @@
 			serialNumber,
 			modelName,
 			brand,
-			type: category,
-			category,
-			status,
+			type: chosenCategory,
+			category: chosenCategory,
+			status: chosenStatus,
 			dateAcquired,
 			pictureUrl,
 		}
