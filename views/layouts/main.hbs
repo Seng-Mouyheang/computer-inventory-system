@@ -14,12 +14,18 @@
 		/>
 		<link rel="stylesheet" href="/css/style.css" />
 	</head>
-	<body>
-		<main class="container-fluid px-4 py-4">
-			{{> flash}}
-			<p class="alert alert-info">This line of text is displayed when you visit localhost:3000.</p>
-			{{{body}}}
+	<body class="app-body">
+		{{> flash}}
+		<main class="app-main">
+			{{> navbar}}
+			<div class="content-area">
+				{{> header}}
+				<section class="content" id="main-content">
+					{{{body}}}
+				</section>
+			</div>
 		</main>
+
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 	</body>
 </html>
