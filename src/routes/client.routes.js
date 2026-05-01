@@ -1,5 +1,6 @@
 import { Router } from 'express'
-import { renderDashboard } from '../controllers/dashboardController.js'
+import { renderApiKeys } from '../controllers/apiKey.controller.js'
+import { renderDashboard } from '../controllers/dashboard.controller.js'
 import { getInventory } from '../controllers/inventory.controller.js'
 import authRouter from './authRoutes.js'
 
@@ -13,6 +14,9 @@ clientRouter.get('/', (req, res) => {
 })
 
 clientRouter.get('/dashboard', renderDashboard)
+
+// ─── Api Key Routes ──────────────────────────────────────────────────────────────────
+clientRouter.get('/apikeys', renderApiKeys)
 
 // ─── Inventory Routes ──────────────────────────────────────────────────────────────────
 clientRouter.get('/inventory', getInventory)
