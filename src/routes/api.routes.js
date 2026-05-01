@@ -9,6 +9,8 @@ import {
 } from '../controllers/inventory.controller.js'
 import { uploadImage } from '../controllers/upload.controller.js'
 import { generateApiKey, listApiKeys, revokeApiKeyById } from '../controllers/apiKey.controller.js'
+import { handleApiLogin } from '../controllers/authController.js'
+import { authenticateApiJwt } from '../middlewares/auth.middleware.js'
 
 const apiRouter = Router()
 
@@ -20,7 +22,12 @@ function notImplemented(req, res) {
 	})
 }
 
-apiRouter.post('/auth/login', notImplemented)
+apiRouter.post('/auth/login', handleApiLogin)
+apiRouter.get('/health', (_req, res) => {
+	res.status(200).json({ status: 'ok' })
+})
+
+apiRouter.use(authenticateApiJwt)
 
 apiRouter.post('/users', notImplemented)
 apiRouter.patch('/users/:id/role', notImplemented)
@@ -41,9 +48,5 @@ apiRouter.delete('/items/:id', deleteDevice)
 
 apiRouter.post('/transactions/checkout', notImplemented)
 apiRouter.post('/transactions/checkin', notImplemented)
-
-apiRouter.get('/health', (_req, res) => {
-	res.status(200).json({ status: 'ok' })
-})
 
 export default apiRouter
