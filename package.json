@@ -14,12 +14,15 @@
 	"author": "Seng Mouyheang, Heng Vicheka, Heng Chanpheakdey",
 	"type": "module",
 	"main": "server.js",
+	"engines": {
+		"node": ">=20"
+	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"dev": "nodemon --exec tsx server.js",
-		"start": "tsx server.js",
+		"start": "node server.js",
 		"nodemon": "nodemon --exec tsx server.js",
-		"build": "vite build",
+		"build": "echo \"No build step required\"",
 		"lint": "eslint .",
 		"lint:prettier": "prettier --check .",
 		"lint:spell": "cspell .",

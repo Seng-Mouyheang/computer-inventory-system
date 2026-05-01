@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { authenticateUser, getAuthCookieOptions, issueAuthToken } from '../utils/auth.js'
 import { getCookieValue } from '../utils/cookies.js'
 import { verifyJwt } from '../utils/jwt.js'
