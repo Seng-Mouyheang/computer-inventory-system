@@ -1,0 +1,163 @@
+<div class="panel block">
+	<div class="stats-grid stats-grid-3">
+		<div class="stat-card stat-total">
+			<div class="stat-label">Total keys</div>
+			<div class="stat-value">{{stats.total}}</div>
+		</div>
+		<div class="stat-card stat-available">
+			<div class="stat-label">Active</div>
+			<div class="stat-value">{{stats.active}}</div>
+		</div>
+		<div class="stat-card stat-maintenance">
+			<div class="stat-label">Revoked</div>
+			<div class="stat-value">{{stats.revoked}}</div>
+		</div>
+	</div>
+
+	<div class="card api-key-card">
+		<div class="card-header">
+			<span class="card-title" style="margin-top: auto; margin-bottom: auto;">API keys</span>
+			<button class="btn btn-primary" type="button" id="openApiKeyModal">+ Generate new key</button>
+		</div>
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="api-key-table">
+					<thead>
+						<tr>
+							<th>Label</th>
+							<th>Key preview</th>
+							<th>Created</th>
+							<th>Status</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{{#each apiKeys}}
+							<tr>
+								<td>{{label}}</td>
+								<td>
+									<div class="key-preview-control">
+										<input
+											class="api-key-preview"
+											type="text"
+											value="{{keyPreview}}"
+											readonly
+											data-key-preview
+											data-hidden-value="{{keyPreview}}"
+											data-full-value="{{keyHash}}"
+											aria-label="Key hash preview"
+										/>
+										<button
+											class="icon-button key-copy"
+											type="button"
+											aria-label="Copy key hash"
+											title="Copy key hash"
+											data-key-copy
+										>
+											<i class="bi bi-copy"></i>
+										</button>
+										<button
+											class="icon-button key-toggle"
+											type="button"
+											aria-label="Show key hash"
+											title="Show key hash"
+											data-key-toggle
+										>
+											<i class="bi bi-eye"></i>
+										</button>
+									</div>
+								</td>
+								<td>{{createdAt}}</td>
+								<td>
+									<span class="status-pill status-pill-{{statusClass}}">{{status}}</span>
+								</td>
+								<td class="table-actions">
+									{{#if isRevoked}}
+										<span class="api-key-revoked-action">Revoked</span>
+									{{else}}
+										<form action="/apikeys/{{id}}/revoke" method="post">
+											<button class="btn btn-secondary btn-revoke" type="submit">Revoke</button>
+										</form>
+									{{/if}}
+								</td>
+							</tr>
+						{{else}}
+							<tr>
+								<td colspan="5" class="empty-state">No API keys have been generated yet.</td>
+							</tr>
+						{{/each}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+{{> api-key-form}}
+
+<script>
+	const apiKeyModal = document.getElementById('apiKeyModal')
+	const openApiKeyModal = document.getElementById('openApiKeyModal')
+
+	function closeApiKeyModal() {
+		apiKeyModal?.classList.remove('open')
+		apiKeyModal?.setAttribute('aria-hidden', 'true')
+	}
+
+	openApiKeyModal?.addEventListener('click', () => {
+		apiKeyModal?.classList.add('open')
+		apiKeyModal?.setAttribute('aria-hidden', 'false')
+		apiKeyModal?.querySelector('input[name="label"]')?.focus()
+	})
+
+	document.querySelectorAll('[data-api-key-close]').forEach((button) => {
+		button.addEventListener('click', closeApiKeyModal)
+	})
+
+	apiKeyModal?.addEventListener('click', (event) => {
+		if (event.target === apiKeyModal) closeApiKeyModal()
+	})
+
+	document.querySelectorAll('[data-key-toggle]').forEach((button) => {
+		button.addEventListener('click', () => {
+			const preview = button.closest('.key-preview-control')?.querySelector('[data-key-preview]')
+			if (!preview) return
+
+			const isHidden = preview.value === preview.dataset.hiddenValue
+			preview.value = isHidden ? preview.dataset.fullValue : preview.dataset.hiddenValue
+			button.setAttribute('aria-label', isHidden ? 'Hide key hash' : 'Show key hash')
+			button.setAttribute('title', isHidden ? 'Hide key hash' : 'Show key hash')
+			button.innerHTML = isHidden ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>'
+		})
+	})
+
+	document.querySelectorAll('[data-key-copy]').forEach((button) => {
+		button.addEventListener('click', async () => {
+			const preview = button.closest('.key-preview-control')?.querySelector('[data-key-preview]')
+			const value = preview?.dataset.fullValue
+			if (!value) return
+
+			try {
+				await navigator.clipboard.writeText(value)
+				button.innerHTML = '<i class="bi bi-check-lg"></i>'
+				button.setAttribute('aria-label', 'Copied key hash')
+				button.setAttribute('title', 'Copied key hash')
+				window.setTimeout(() => {
+					button.innerHTML = '<i class="bi bi-copy"></i>'
+					button.setAttribute('aria-label', 'Copy key hash')
+					button.setAttribute('title', 'Copy key hash')
+				}, 1200)
+			} catch (_error) {
+				const textArea = document.createElement('textarea')
+				textArea.value = value
+				textArea.setAttribute('readonly', '')
+				textArea.style.position = 'fixed'
+				textArea.style.opacity = '0'
+				document.body.appendChild(textArea)
+				textArea.select()
+				document.execCommand('copy')
+				textArea.remove()
+			}
+		})
+	})
+</script>

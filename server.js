@@ -13,6 +13,7 @@ app.use(auditLogger)
 app.use(corsMiddleware)
 app.use(rateLimitMiddleware)
 app.use(express.json({ limit: '20mb' }))
+app.use(express.urlencoded({ extended: false }))
 
 app.use('/api', apiRouter)
 app.use('/', clientRouter)

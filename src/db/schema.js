@@ -20,7 +20,7 @@ export const users = sqliteTable('users', {
 		.notNull()
 		.references(() => userRoles.id),
 	passwordHash: text('password_hash').notNull(),
-	apiKeyHash: text('api_key_hash'),
+	apiKeyId: integer('api_key_id').references(() => apiKeys.id),
 
 	status: text('status').notNull(),
 	profilePictureUrl: text('profile_picture_url'),
@@ -128,6 +128,27 @@ export const history = sqliteTable('history', {
 })
 
 /* =========================
+   API KEYS
+========================= */
+export const apiKeys = sqliteTable('api_keys', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+
+	keyHash: text('key_hash').notNull(),
+	label: text('label').notNull(),
+	status: integer('status', { mode: 'boolean' }).default(true),
+
+	dateCreated: text('date_created')
+		.default(sql`CURRENT_TIMESTAMP`)
+		.notNull(),
+
+	dateUpdated: text('date_updated')
+		.default(sql`CURRENT_TIMESTAMP`)
+		.notNull(),
+	isDeleted: integer('is_deleted', { mode: 'boolean' }).default(false),
+	dateDeleted: text('date_deleted'),
+})
+
+/* =========================
    USERS RELATIONS
 ========================= */
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -136,6 +157,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 		references: [userRoles.id],
 	}),
 	history: many(history),
+	apiKey: one(apiKeys, {
+		fields: [users.apiKeyId],
+		references: [apiKeys.id],
+	}),
 }))
 
 /* =========================

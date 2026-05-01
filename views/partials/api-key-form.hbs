@@ -1,0 +1,22 @@
+<div class="modal-overlay" id="apiKeyModal" aria-hidden="true">
+	<div class="modal" role="dialog" aria-modal="true" aria-labelledby="apiKeyModalTitle">
+		<div class="modal-header">
+			<span id="apiKeyModalTitle" style="font-size: 14px; font-weight: 500">Generate new API key</span>
+			<button class="modal-close button-reset" type="button" aria-label="Close modal" data-api-key-close>
+				<i class="bi bi-x-lg"></i>
+			</button>
+		</div>
+		<form action="/apikeys" method="post">
+			<div class="form-grid api-key-form-grid">
+				<label class="form-field form-field-full">
+					<span>Label</span>
+					<input type="text" name="label" placeholder="Production integration" required />
+				</label>
+			</div>
+			<div class="form-actions">
+				<button class="btn" type="button" data-api-key-close>Cancel</button>
+				<button class="btn btn-primary" type="submit">Generate key</button>
+			</div>
+		</form>
+	</div>
+</div>
